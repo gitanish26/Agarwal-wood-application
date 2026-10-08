@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wood Plank Calculator</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="page"><a href="index.html">← Home</a><h1>Wood Plank Calculator</h1>
+<div id="rows"></div><button onclick="addRow()">+ Add Plank</button>
+<div class="summary"><b>Total Sq.Ft:</b> <span id="total">0.00</span><br><b>Grand Total:</b> ₹<span id="grand">0.00</span></div>
+<button onclick="newCalc()">New Calculation</button></main>
+<script>
+function addRow(d={}){let x=document.createElement("div");x.className="box row";x.innerHTML=`
+<label>Length (ft)<input class="len" type="number" step=".01" value="${d.len||""}" oninput="calc()"></label>
+<label>Width (in)<input class="wid" type="number" step=".01" value="${d.wid||""}" oninput="calc()"></label>
+<label>Quantity<input class="qty" type="number" min="1" value="${d.qty||1}" oninput="calc()"></label>
+<label>Rate / Sq.Ft (₹)<input class="rate" type="number" step=".01" value="${d.rate||""}" oninput="calc()"></label>
+<div>Sq.Ft: <b class="sq">0.00</b> &nbsp; Amount: ₹<b class="amt">0.00</b></div>
+<button class="danger" onclick="this.parentElement.remove();calc()">Remove</button>`;document.getElementById("rows").appendChild(x);calc()}
+function calc(){let t=0,g=0;document.querySelectorAll(".row").forEach(r=>{let l=+r.querySelector(".len").value||0,w=+r.querySelector(".wid").value||0,q=+r.querySelector(".qty").value||0,rate=+r.querySelector(".rate").value||0,s=l*w/12*q,a=s*rate;r.querySelector(".sq").textContent=s.toFixed(2);r.querySelector(".amt").textContent=a.toFixed(2);t+=s;g+=a});total.textContent=t.toFixed(2);grand.textContent=g.toFixed(2)}
+function newCalc(){rows.innerHTML="";addRow()} addRow();
+</script></body></html>

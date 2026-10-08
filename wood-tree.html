@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Raw Wood / Tree Calculator</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="page"><a href="index.html">← Home</a><h1>Raw Wood / Tree Calculator</h1>
+<div id="entries"></div>
+<button onclick="addEntry()">+ Add Wood</button> <button onclick="saveRecord()">Save Record</button> <button onclick="newCalc()">New Calculation</button>
+<div class="summary"><b>Total CuFt:</b> <span id="total">0.00</span><br><b>Total CuM:</b> <span id="cum">0.000</span></div>
+<h2>Saved Records</h2><div id="saved"></div></main>
+<script>
+const KEY="agarwalWoodRecords";
+function esc(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function addEntry(d={}){let x=document.createElement("div");x.className="box entry";x.innerHTML=`
+<label>Wood Name (type manually)<input class="wood" type="text" placeholder="e.g. Teak Wood" value="${esc(d.wood||"")}"></label>
+<label>Length (ft)<input class="len" type="number" step=".01" value="${d.length||""}" oninput="calc()"></label>
+<label>Perimeter (inch)<input class="per" type="number" step=".01" value="${d.perimeter||""}" oninput="calc()"></label>
+<label>Quantity<input class="qty" type="number" min="1" value="${d.quantity||1}" oninput="calc()"></label>
+<div>CuFt: <b class="cuft">0.00</b></div><button class="danger" onclick="this.parentElement.remove();calc()">Remove</button>`;entries.appendChild(x);calc()}
+function calc(){let t=0;document.querySelectorAll(".entry").forEach(r=>{let l=+r.querySelector(".len").value||0,p=+r.querySelector(".per").value||0,q=+r.querySelector(".qty").value||0,c=l*p*p/2304*q;r.querySelector(".cuft").textContent=c.toFixed(2);t+=c});total.textContent=t.toFixed(2);cum.textContent=(t*.028316846592).toFixed(3)}
+function saveRecord(){let a=[];document.querySelectorAll(".entry").forEach(r=>{let wood=r.querySelector(".wood").value.trim(),length=+r.querySelector(".len").value||0,perimeter=+r.querySelector(".per").value||0,quantity=+r.querySelector(".qty").value||0,cuft=length*perimeter*perimeter/2304*quantity;if(wood||length||perimeter)a.push({wood,length,perimeter,quantity,cuft})});if(!a.length)return alert("Please enter at least one wood record.");let rs=JSON.parse(localStorage.getItem(KEY)||"[]");rs.unshift({date:new Date().toLocaleString(),entries:a,totalCuft:a.reduce((s,e)=>s+e.cuft,0)});localStorage.setItem(KEY,JSON.stringify(rs));render();alert("Record saved successfully.")}
+function render(){let rs=JSON.parse(localStorage.getItem(KEY)||"[]");saved.innerHTML=rs.length?rs.map((r,i)=>`<div class="box"><b>${esc(r.date)}</b>${r.entries.map(e=>`<p><b>${esc(e.wood||"Unnamed Wood")}</b><br>Length: ${e.length} ft | Perimeter: ${e.perimeter} in | Qty: ${e.quantity} | CuFt: ${e.cuft.toFixed(2)}</p>`).join("")}<b>Total: ${r.totalCuft.toFixed(2)} CuFt</b><br><button class="danger" onclick="del(${i})">Delete</button></div>`).join(""):"<p>No saved records yet.</p>"}
+function del(i){let rs=JSON.parse(localStorage.getItem(KEY)||"[]");rs.splice(i,1);localStorage.setItem(KEY,JSON.stringify(rs));render()}
+function newCalc(){entries.innerHTML="";addEntry()} addEntry();render();
+</script></body></html>
